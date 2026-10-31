@@ -46,7 +46,7 @@ assert(spawnCount === 16, `wave design totals 16 enemies (got ${spawnCount})`);
 
 // simulate ~50s of play: auto-target nearest enemy, attack when close
 const p = game.player;
-step(50, 1 / 60, () => {
+step(80, 1 / 60, () => {
   const enemies = game.enemies.filter((e) => e.alive);
   if (enemies.length) {
     let best = enemies[0];
@@ -59,12 +59,17 @@ step(50, 1 / 60, () => {
     (game as any).input.state.moveZ = bd > 2 ? Math.sign(best.pos.z - p.pos.z) : 0;
     (game as any).input.state.light = bd < 3;
     if (p.specialReady) (game as any).input.state.special = true;
-    // face the enemy by steering the camera behind the player
-    (game as any).cam.yaw = Math.atan2(p.pos.x - best.pos.x, p.pos.z - best.pos.z);
+    (game as any).cam.yaw = Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z);
+  } else {
+    const gate = (game as any).portal;
+    if (gate && gate.active) {
+      (game as any).cam.yaw = Math.atan2(gate.pos.x - p.pos.x, gate.pos.z - p.pos.z);
+      (game as any).input.state.moveZ = 1;
+    }
   }
 });
 log.push(`state after 50s: phase=${game.phase} score=${game.score} kills=${game.player.kills} enemies=${game.enemies.length} combo=${game.player.combo} hp=${game.player.hp.map((x: number) => Math.round(x)).join('/')}`);
-assert(game.player.kills > 5, `player actually kills enemies (${game.player.kills})`);
+assert(game.player.kills >= 10, `player actually kills enemies (${game.player.kills})`);
 
 // ---------- boss level ----------
 game.loadLevel(3);

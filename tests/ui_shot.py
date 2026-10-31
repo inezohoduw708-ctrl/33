@@ -146,6 +146,53 @@ def draw_levels(dst):
     cmd += [dst]
     run(cmd)
 
+
+
+def draw_clear(dst):
+    cmd = ['convert', '-size', f'{W}x{H}', 'xc:none',
+           '-fill', '#050a0df2', '-draw', f'rectangle 0,0 {W},{H}']
+    px, py = 400, 90
+    cmd += ['-fill', '#0a1317fa', '-stroke', '#7ee04a38', '-draw', f'roundrectangle {px},{py} {px+480},{py+540} 16,16']
+    cmd += ['-fill', '#7ee04a', '-font', F, '-pointsize', '92', '-annotate', f'+{px+200}+{py+120}', 'A']
+    cmd += ['-fill', '#f2fff0', '-font', F, '-pointsize', '30', '-annotate', f'+{px+62}+{py+172}', 'ГЛАВА ПРОЙДЕНА']
+    rows = [('Очки', '5 434'), ('Время', '1:06'), ('Побеждено', '21'), ('Макс. комбо', '24'),
+            ('Урона получено', '148'), ('Без потерь', 'ДА')]
+    for i, (k, v) in enumerate(rows):
+        y = py + 220 + i * 34
+        cmd += ['-fill', '#a9bdb0', '-font', FR, '-pointsize', '13', '-annotate', f'+{px+48}+{y}', k]
+        cmd += ['-fill', '#ffffff', '-font', F, '-pointsize', '17', '-annotate', f'+{px+230}+{y}', v]
+        cmd += ['-stroke', '#ffffff1a', '-draw', f'line {px+48},{y+8} {px+430},{y+8}']
+    cmd += ['-fill', '#1de3c21a', '-stroke', '#1de3c266', '-draw', f'roundrectangle {px+40},{py+432} {px+440},{py+474} 9,9']
+    cmd += ['-fill', '#b8f5ea', '-font', FR, '-pointsize', '13', '-annotate', f'+{px+58}+{py+458}', 'Открыта новая глава: Крыши и дождь']
+    cmd += ['-fill', '#7ee04a', '-stroke', 'none', '-draw', f'roundrectangle {px+40},{py+490} {px+262},{py+534} 8,8']
+    cmd += ['-fill', '#06120a', '-font', F, '-pointsize', '16', '-annotate', f'+{px+56}+{py+519}', 'СЛЕДУЮЩАЯ ГЛАВА']
+    cmd += ['-stroke', '#ffffff2e', '-fill', 'none', '-draw', f'roundrectangle {px+274},{py+490} {px+440},{py+534} 8,8']
+    cmd += ['-fill', '#e9f6ea', '-font', F, '-pointsize', '16', '-annotate', f'+{px+300}+{py+519}', 'В МЕНЮ']
+    cmd += [dst]
+    run(cmd)
+
+def draw_boss(dst):
+    cmd = ['convert', '-size', f'{W}x{H}', 'xc:none', '-fill', 'none']
+    cmd += ['-stroke', '#ff3b30', '-strokewidth', '2', '-draw', f'line 360,250 920,250']
+    cmd += ['-fill', '#ffffff', '-font', F, '-pointsize', '96', '-annotate', '+352+340', 'Ш Р Е Д Д Е Р']
+    cmd += ['-fill', '#ff8b80', '-font', F, '-pointsize', '14', '-annotate', '+490+366', 'О С Т Р И Ё   К Л А Н А   Ф У Т']
+    # boss hp bar top
+    cmd += ['-fill', '#ffffff', '-font', F, '-pointsize', '16', '-annotate', '+530+134', 'ШРЕДДЕР']
+    cmd += ['-fill', '#ff7b6b', '-font', F, '-pointsize', '12', '-annotate', '+660+134', '— ЯРОСТЬ КЛАНА']
+    cmd += ['-fill', '#140000c0', '-stroke', '#ff503c', '-draw', 'roundrectangle 330,144 950,158 7,7']
+    cmd += ['-fill', '#ff3b30', '-stroke', 'none', '-draw', 'roundrectangle 332,146 700,156 5,5']
+    cmd += [dst]
+    run(cmd)
+
+if __name__ == '__main__':
+    make_bg('/tmp/bg_clear.png', 'shots/battle.png', blur=7)
+    draw_clear('/tmp/clear_layer.png')
+    run(['convert', '/tmp/bg_clear.png', '/tmp/clear_layer.png', '-composite', f'{OUT}/ui-clear.png'])
+    make_bg('/tmp/bg_boss.png', 'shots/villains.png', blur=5)
+    draw_boss('/tmp/boss_layer.png')
+    run(['convert', '/tmp/bg_boss.png', '/tmp/boss_layer.png', '-composite', f'{OUT}/ui-boss.png'])
+    print('extra ui shots ready')
+
 if __name__ == '__main__':
     base = 'shots/city.png'
     make_bg('/tmp/bg_hud.png', base, blur=0)

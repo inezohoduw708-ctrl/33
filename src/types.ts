@@ -45,6 +45,19 @@ export interface WaveDef {
   banner?: string;
 }
 
+export interface LevelModifiers {
+  /** enemy damage multiplier */
+  damage?: number;
+  /** enemy move speed multiplier */
+  speed?: number;
+  /** enemy hit-point multiplier */
+  hp?: number;
+  /** chance an enemy spawns as a ranged shooter */
+  shooters?: boolean;
+  /** adds an extra wave behind the listed ones */
+  extraWave?: WaveDef;
+}
+
 export interface LevelDef {
   id: number;
   name: string;
@@ -55,4 +68,5 @@ export interface LevelDef {
   waves: WaveDef[];
   boss?: boolean;
   seed: number;
+  mods?: LevelModifiers;
 }

@@ -6,6 +6,7 @@ import { Enemy, Boss } from './enemy';
 import { PickupManager } from './pickups';
 import type { CombatContext, Projectile } from './context';
 import { GameCamera } from './camera';
+import { WavePortal } from './portal';
 import { LEVELS } from './levels';
 import { Input } from '../core/input';
 import { audio } from '../core/audio';
@@ -67,6 +68,8 @@ export class Game {
   private waveTransition = 0;
   private levelTime = 0;
   private boss: Boss | null = null;
+  private portal: WavePortal | null = null;
+  private portalHold = 0;
   private bossSpawned = false;
   private menuTurtles: THREE.Group[] = [];
   private menuGroup = new THREE.Group();
@@ -207,6 +210,7 @@ export class Game {
     this.cleanupWorld();
     this.city = new City(this.scene, this.level);
     this.ctx.city = this.city;
+    this.ctx.levelMods = this.level.mods;
     this.pickups.reset();
     this.enemies.length = 0;
     this.projectiles.length = 0;
@@ -221,6 +225,11 @@ export class Game {
     this.noDeathRun = true;
     this.player.reset(true);
     this.enterGameplayRigs();
+    if (!this.portal) {
+      this.portal = new WavePortal(this.scene);
+      this.portal.ctxFx = this.fx;
+    }
+    this.portal.hide();
     this.player.setTurtle(this.cb.save().selected || 'leo', true);
     for (const id of TURTLE_ORDER) this.player.hp[TURTLE_ORDER.indexOf(id)] = TURTLES[id].maxHp;
     this.cam.yaw = Math.PI;
@@ -305,9 +314,22 @@ export class Game {
     if (this.level.boss && index === this.level.waves.length - 1) this.spawnBoss();
   }
 
+  private showBossBanner() {
+    const el = document.getElementById('boss-banner');
+    if (!el) return;
+    el.classList.remove('hidden', 'out');
+    window.clearTimeout((this as any)._bbT1);
+    window.clearTimeout((this as any)._bbT2);
+    (this as any)._bbT1 = window.setTimeout(() => {
+      el.classList.add('out');
+      (this as any)._bbT2 = window.setTimeout(() => el.classList.add('hidden'), 520);
+    }, 2000);
+  }
+
   private spawnBoss() {
     if (this.bossSpawned) return;
     this.bossSpawned = true;
+    this.showBossBanner();
     const b = new Boss(this.ctx, 0, -18);
     b.onSummon = () => {
       this.hud.toast('ШРЕДДЕР ПРИЗЫВАЕТ ПОДКРЕПЛЕНИЕ', 2200);
@@ -375,11 +397,25 @@ export class Game {
       return;
     }
 
-    // ---- timed pause between waves ----
+    // ---- first wave of the chapter starts on its own ----
+    if (!this.waveActive && this.waveIndex === 0 && !this.portal?.active) {
+      this.startWave(0);
+      this.updateObjective();
+      return;
+    }
+
+    // ---- between waves: wait for the manhole gate ----
     if (!this.waveActive) {
-      if (this.waveTransition > 0) {
-        this.waveTransition -= dt;
-        if (this.waveTransition <= 0 && this.waveIndex < totalWaves) this.startWave(this.waveIndex);
+      if (this.waveIndex < totalWaves) {
+        this.portal?.update(dt);
+        const inGate = this.portal?.isInside(this.player.pos.x, this.player.pos.z) ?? false;
+        this.portalHold = inGate ? this.portalHold + dt : 0;
+        if (this.portalHold > 0.25) {
+          this.portal?.hide();
+          this.portalHold = 0;
+          this.waveTransition = 0;
+          this.startWave(this.waveIndex);
+        }
       }
       this.updateObjective();
       return;
@@ -422,6 +458,16 @@ export class Game {
           : `ВОЛНА ${this.waveIndex} ОЧИЩЕНА`,
         2000,
       );
+      // offer the manhole gate: step in when you are ready
+      if (this.portal) {
+        const ahead = 3.5;
+        const px = clamp(this.player.pos.x + Math.sin(this.player.facing) * ahead, -10, 10);
+        const pz = clamp(this.player.pos.z + Math.cos(this.player.facing) * ahead, -70, 70);
+        this.portal.showAt(px, pz);
+        this.hud.toast('ШАГНИ В ЛЮК, КОГДА БУДЕШЬ ГОТОВ', 2400);
+      }
+      this.updateObjective();
+      return;
     }
     this.updateObjective();
   }
@@ -540,6 +586,7 @@ export class Game {
     this.levelTime += dt;
     this.ctx.time = this.time;
     this.city?.update(dt);
+    this.portal?.update(dt);
 
     this.player.update(dt, this.cam.yaw, inp, { light: this.input.isMouseHeld(1) || inp.light });
 
@@ -760,6 +807,7 @@ export class Game {
   }
 
   hideIntro() {
+    this.portal?.hide();
     const el = document.getElementById('level-intro');
     if (!el) return;
     el.classList.add('hidden');

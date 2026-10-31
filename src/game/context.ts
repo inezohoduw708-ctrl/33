@@ -22,6 +22,7 @@ export interface CombatContext {
   enemies: Enemy[];
   projectiles: Projectile[];
   time: number;
+  levelMods?: import('../types').LevelModifiers;
   shake(amount: number): void;
   hitStop(sec: number): void;
   addScore(n: number): void;

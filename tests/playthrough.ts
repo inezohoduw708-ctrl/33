@@ -30,8 +30,17 @@ const bot = (t: number) => {
   const st: any = (game as any).input.state;
   const p = game.player;
   const alive = game.enemies.filter((e) => e.alive);
+  // presses are consumed by the game each frame, so clear movement but re-raise actions
   st.moveX = 0; st.moveZ = 0; st.light = false; st.heavy = false;
-  if (!alive.length) return;
+  if (!alive.length) {
+    // head to the manhole gate to start the next wave
+    const gate: any = (game as any).portal;
+    if (gate && gate.active) {
+      (game as any).cam.yaw = Math.atan2(gate.pos.x - p.pos.x, gate.pos.z - p.pos.z);
+      st.moveZ = 1;
+    }
+    return;
+  }
   let best = alive[0];
   let bd = Infinity;
   for (const e of alive) {

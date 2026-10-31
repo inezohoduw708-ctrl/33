@@ -4,7 +4,7 @@ ok  level 1 loads into playing state
 ok  city built
 ok  colliders created (51)
 ok  wave design totals 16 enemies (got 16)
-state after 50s: phase=clear score=3386 kills=16 enemies=5 combo=24 hp=63/135/105/100
+state after 50s: phase=clear score=3364 kills=16 enemies=6 combo=25 hp=55/135/105/100
 ok  player actually kills enemies (16)
 ok  boss level loads
 ok  shredder spawned
@@ -13,7 +13,7 @@ ok  boss entered later phase (phase=3)
 ok  boss lost health
 ok  boss survived the burn-in
 ok  boss still alive after burn
-boss fight: bossAlive=false bossHp=0 playerHp=0/89/105/100 projectiles=0
+boss fight: bossAlive=false bossHp=0 playerHp=0/13/105/100 projectiles=0
 ok  swap to raphael
 ok  swap to donatello
 ok  pickup detected nearby

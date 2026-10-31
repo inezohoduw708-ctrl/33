@@ -260,6 +260,7 @@ kbd {
 .stat { display: flex; justify-content: space-between; font-size: 13px; color: #a9bdb0; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
 .stat b { font-family: var(--font); font-size: 17px; letter-spacing: 1px; color: #fff; }
 .pause-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.pause-actions .btn { flex: 1 1 160px; min-width: 0; font-size: 17px; letter-spacing: 2px; padding: 12px 16px; }
 
 .rank {
   font-family: var(--font); font-size: 92px; line-height: 0.8; color: var(--green);
@@ -268,7 +269,7 @@ kbd {
 .unlock { margin: 4px 0 18px; padding: 10px 14px; border-radius: 9px; background: rgba(29, 227, 194, 0.1); border: 1px solid rgba(29, 227, 194, 0.4); font-size: 13px; color: #b8f5ea; }
 #over .panel { text-align: center; border-color: rgba(255, 60, 60, 0.35); }
 #over h2 { color: #ff8b80; }
-#clear .panel { min-width: 420px; }
+#clear .panel { min-width: min(460px, 92vw); }
 #clear h2 { margin-bottom: 10px; }
 
 /* ---------- Loader ---------- */
@@ -295,6 +296,26 @@ kbd {
 .li-desc { margin-top: 10px; max-width: 560px; text-align: center; font-size: 13.5px; line-height: 1.6; color: #adc0b2; padding: 0 20px; }
 @keyframes liIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
 @keyframes liOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* ---------- Boss banner ---------- */
+#boss-banner {
+  position: absolute; left: 0; right: 0; top: 34%; z-index: 9; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  animation: bossIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+#boss-banner.out { animation: bossOut 0.5s ease-in both; }
+.bb-line {
+  width: min(560px, 70vw); height: 2px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  box-shadow: 0 0 22px rgba(255, 59, 48, 0.9);
+}
+.bb-name {
+  font-family: var(--font); font-size: clamp(46px, 9vw, 118px); letter-spacing: 10px; color: #fff;
+  text-shadow: 0 0 50px rgba(255, 30, 20, 0.85), 5px 6px 0 #2a0000; line-height: 1;
+}
+.bb-sub { font-family: var(--font); letter-spacing: 6px; font-size: 13px; color: #ff8b80; }
+@keyframes bossIn { from { opacity: 0; transform: scale(1.18); letter-spacing: 40px; } to { opacity: 1; transform: scale(1); } }
+@keyframes bossOut { to { opacity: 0; transform: scale(1.06); } }
 
 /* ---------- Toast ---------- */
 #toast {

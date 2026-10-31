@@ -9,6 +9,7 @@ export const LEVELS: LevelDef[] = [
     objective: 'Очисти переулок',
     timeOfDay: 'night',
     seed: 1337,
+    mods: { damage: 1, speed: 1, hp: 1 },
     waves: [
       { enemies: [{ kind: 'foot', count: 4 }], banner: 'ВОЛНА 1 — ПАТРУЛЬ ФУТ' },
       { enemies: [{ kind: 'foot', count: 5 }, { kind: 'shooter', count: 1 }], banner: 'ВОЛНА 2 — ПОДКРЕПЛЕНИЕ' },
@@ -23,6 +24,7 @@ export const LEVELS: LevelDef[] = [
     objective: 'Отбей рынок',
     timeOfDay: 'dusk',
     seed: 4242,
+    mods: { damage: 1.1, speed: 1.05, hp: 1.1, shooters: true },
     waves: [
       { enemies: [{ kind: 'foot', count: 5 }, { kind: 'shooter', count: 2 }], banner: 'ВОЛНА 1 — ТОРГОВЦЫ СМЕРТИ' },
       { enemies: [{ kind: 'foot_heavy', count: 3 }, { kind: 'foot', count: 3 }], banner: 'ВОЛНА 2 — МЯСНИКИ' },
@@ -37,6 +39,7 @@ export const LEVELS: LevelDef[] = [
     objective: 'Пробейся сквозь засаду',
     timeOfDay: 'storm',
     seed: 9001,
+    mods: { damage: 1.22, speed: 1.12, hp: 1.25, shooters: true },
     waves: [
       { enemies: [{ kind: 'foot', count: 6 }, { kind: 'shooter', count: 2 }], banner: 'ВОЛНА 1 — ЗАСАДА' },
       { enemies: [{ kind: 'brute', count: 2 }, { kind: 'foot_heavy', count: 2 }], banner: 'ВОЛНА 2 — ТЯЖЁЛЫЙ ОТРЯД' },
@@ -51,6 +54,7 @@ export const LEVELS: LevelDef[] = [
     objective: 'Победи Шреддера',
     timeOfDay: 'night',
     seed: 66613,
+    mods: { damage: 1.35, speed: 1.18, hp: 1.35 },
     boss: true,
     waves: [
       { enemies: [{ kind: 'foot', count: 4 }, { kind: 'foot_heavy', count: 2 }], banner: 'СТРАЖА ШРЕДДЕРА' },

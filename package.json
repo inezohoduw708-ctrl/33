@@ -10,7 +10,9 @@
     "test:smoke": "esbuild tests/run.ts --bundle --platform=node --format=cjs --outfile=tests/run.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/run.cjs",
     "test:boot": "esbuild tests/boot.ts --bundle --platform=node --format=cjs --outfile=tests/boot.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/boot.cjs",
     "test:play": "esbuild tests/playthrough.ts --bundle --platform=node --format=cjs --outfile=tests/play.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/play.cjs",
-    "shots": "esbuild tests/scene_shot.ts --bundle --platform=node --format=cjs --outfile=tests/shot.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/shot.cjs"
+    "shots": "esbuild tests/scene_shot.ts --bundle --platform=node --format=cjs --outfile=tests/shot.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/shot.cjs",
+    "test:leak": "esbuild tests/leak.ts --bundle --platform=node --format=cjs --outfile=tests/leak.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/leak.cjs",
+    "test:all": "npm run test:smoke && npm run test:boot && npm run test:play && npm run test:leak"
   },
   "dependencies": {
     "three": "^0.170.0"

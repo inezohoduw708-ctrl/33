@@ -74,6 +74,13 @@ export class Enemy {
     this.ctx = ctx;
     this.kind = kind;
     this.stats = { ...STATS[kind] };
+    const mods = ctx.levelMods;
+    if (mods) {
+      this.stats.damage *= mods.damage ?? 1;
+      this.stats.speed *= mods.speed ?? 1;
+      this.stats.hp *= mods.hp ?? 1;
+    }
+    this.stats.hp = Math.round(this.stats.hp);
     this.maxHp = this.stats.hp;
     this.hp = this.maxHp;
     this.radius = this.stats.radius;
@@ -531,7 +538,11 @@ export class Boss extends Enemy {
     super(ctx, 'boss', x, z);
     this.radius = 0.95;
     this.aimY = 1.6;
+    // Shredder is already tuned for the final chapter; keep him consistent
     this.stats.speed = 3.9;
+    this.stats.damage = STATS.boss.damage;
+    this.maxHp = STATS.boss.hp;
+    this.hp = this.maxHp;
   }
 
   protected createRig(): CharacterRig {
