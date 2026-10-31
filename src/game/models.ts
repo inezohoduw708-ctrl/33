@@ -216,6 +216,7 @@ export class TurtleRig {
   private cur: PoseParams = { ...ZERO };
   private bannerTails: THREE.Object3D[] = [];
   private offHand: THREE.Object3D | null = null;
+  bladeTrail: THREE.Mesh;
   private specialRing: THREE.Mesh;
 
   constructor(public def: TurtleDef) {
@@ -424,6 +425,23 @@ export class TurtleRig {
     this.root.add(this.shadowAnchor);
 
     const ringGeo = new THREE.RingGeometry(0.6, 2.4, 40);
+    // additive blade trail that only shows during strikes
+    this.bladeTrail = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.55, 0.55),
+      new THREE.MeshBasicMaterial({
+        color: def.color,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        map: radialTexture('rgba(255,255,255,0.85)', 'rgba(255,255,255,0)'),
+      }),
+    );
+    this.bladeTrail.position.set(0, -0.5, 0.55);
+    this.bladeTrail.visible = false;
+    this.elbowR.add(this.bladeTrail);
+
     this.specialRing = new THREE.Mesh(
       ringGeo,
       new THREE.MeshBasicMaterial({
@@ -573,6 +591,22 @@ export class TurtleRig {
       kneeRx = 0.06;
     }
 
+    if (c.mode === 'victory') {
+      // arms up, chest out, small winning bounce
+      const bounce = Math.abs(Math.sin(t * 3.4));
+      armR.x = -2.5 + Math.sin(t * 3.4) * 0.18;
+      armL.x = -2.5 - Math.sin(t * 3.4) * 0.18;
+      armR.z = 0.5;
+      armL.z = -0.5;
+      elbowR = -0.35;
+      elbowL = -0.35;
+      bodyY = bounce * 0.07;
+      bodyRotX = -0.06;
+      headX = -0.12;
+      legLx = 0.05;
+      legRx = -0.05;
+    }
+
     if (c.mode === 'attack') {
       const p1 = Math.sin(Math.min(1, atk) * Math.PI);
       if (kind === 'light1') {
@@ -704,6 +738,22 @@ export class TurtleRig {
       const flutter = Math.sin(t * 7 + i * 1.7) * 0.12 + run * 0.3 + c.hurt * 0.3;
       tail.rotation.x = damp(tail.rotation.x, 0.5 + flutter, 8, dt);
       tail.rotation.z = damp(tail.rotation.z, Math.sin(t * 5 + i) * 0.14, 8, dt);
+    }
+
+    // blade trail lights up through the active part of a strike
+    const striking = c.mode === 'attack' && kind !== 'special' && atk > 0.05 && atk < 0.92;
+    const spinAttack = c.mode === 'attack' && kind === 'light3' && atk > 0.02;
+    if (this.bladeTrail) {
+      const m = this.bladeTrail.material as THREE.MeshBasicMaterial;
+      if (striking || spinAttack) {
+        this.bladeTrail.visible = true;
+        m.opacity = Math.min(0.85, (1 - Math.abs(atk - 0.45) * 1.5) * 1.1);
+        this.bladeTrail.scale.set(1 + atk * 0.35, 1 + atk * 0.2, 1);
+        this.bladeTrail.rotation.z = -0.5 + atk * 1.1;
+      } else {
+        m.opacity = Math.max(0, m.opacity - dt * 6);
+        if (m.opacity <= 0.01) this.bladeTrail.visible = false;
+      }
     }
 
     // weapon spin during specials (both hands)

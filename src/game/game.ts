@@ -164,8 +164,7 @@ export class Game {
       holder.position.set(x, 0, 0);
       holder.rotation.y = -0.35 + i * 0.2;
       this.menuGroup.add(holder);
-      this.menuGroup.add(this.scene.children.length ? new THREE.Object3D() : new THREE.Object3D());
-      // Reparent rigs into the menu lineup (no clones needed for perf)
+      // reparent rigs into the menu lineup (no clones needed for perf)
       holder.add(rig.root);
       this.menuTurtles.push(holder as unknown as THREE.Group);
     });
