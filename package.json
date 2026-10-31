@@ -12,7 +12,9 @@
     "test:play": "esbuild tests/playthrough.ts --bundle --platform=node --format=cjs --outfile=tests/play.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/play.cjs",
     "shots": "esbuild tests/scene_shot.ts --bundle --platform=node --format=cjs --outfile=tests/shot.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/shot.cjs",
     "test:leak": "esbuild tests/leak.ts --bundle --platform=node --format=cjs --outfile=tests/leak.cjs --loader:.ts=ts --external:jsdom --log-level=warning && node tests/leak.cjs",
-    "test:all": "npm run test:smoke && npm run test:boot && npm run test:play && npm run test:leak"
+    "test:all": "npm run test:smoke && npm run test:boot && npm run test:play && npm run test:leak",
+    "single": "npm run build && node tests/make_single_file.mjs game.html",
+    "test:single": "node tests/verify_single.cjs"
   },
   "dependencies": {
     "three": "^0.170.0"
