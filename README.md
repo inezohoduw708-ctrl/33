@@ -140,3 +140,12 @@ npm run test:single  # запуск самодостаточного game.html �
 
 Скриншоты для визуального контроля (в `shots/`): программный raycast-рендер сцены в PNG —
 `npm run shots`.
+
+## Открыть в браузере по ссылке
+
+Одна ссылка, открывается в Яндекс Браузере (нужен интернет, т.к. файл отдаётся с GitHub):
+
+**https://htmlpreview.github.io/?https://raw.githubusercontent.com/inezohoduw708-ctrl/33/arena/33e76698-33/game.html**
+
+Это та же сборка, что и `game.html` в репозитории (один файл, без сервера и модулей).
+
