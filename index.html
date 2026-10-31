@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#08131a" />
+    <title>Черепашки-ниндзя: Тени Нью-Йорка</title>
+    <meta name="description" content="3D-экшен про Черепашек-ниндзя: улицы Нью-Йорка, комбо-боёвка, четыре черепашки и Шреддер." />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game"></canvas>
+
+      <!-- Атмосферные слои -->
+      <div id="vignette"></div>
+      <div id="damage-flash"></div>
+      <div id="combo-pop"></div>
+
+      <!-- ================= HUD ================= -->
+      <div id="hud" class="hidden">
+        <div class="hud-top">
+          <div class="turtle-bar" id="turtle-bar"></div>
+          <div class="objective">
+            <div class="obj-kicker" id="obj-kicker">ГЛАВА 1</div>
+            <div class="obj-title" id="obj-title">Переулок Клинка</div>
+            <div class="obj-progress"><div class="obj-fill" id="obj-fill"></div></div>
+            <div class="obj-sub" id="obj-sub">Враги: 8 / 8</div>
+          </div>
+          <div class="score-box">
+            <div class="score" id="score">0</div>
+            <div class="score-label">ОЧКИ</div>
+            <div class="combo" id="combo"><span>0</span><em>КОМБО</em></div>
+          </div>
+        </div>
+
+        <div class="boss-wrap hidden" id="boss-wrap">
+          <div class="boss-name">ШРЕДДЕР <span id="boss-phase">— Остриё Клана</span></div>
+          <div class="boss-bar"><div id="boss-fill"></div></div>
+        </div>
+
+        <div class="hud-bottom">
+          <div class="energy-box">
+            <div class="energy-label">ЭНЕРГИЯ</div>
+            <div class="energy-bar"><div id="energy-fill"></div></div>
+            <div class="energy-hint" id="energy-hint">Спецприём: готов</div>
+          </div>
+          <div class="hint-chips" id="hint-chips">
+            <span><b>WASD</b> движение</span>
+            <span><b>J</b>/ЛКМ удар</span>
+            <span><b>K</b> тяжёлый</span>
+            <span><b>L</b> спецприём</span>
+            <span><b>Пробел</b> прыжок</span>
+            <span><b>Shift</b> рывок</span>
+            <span><b>Q</b>/1-4 черепашка</span>
+            <span><b>H</b> помощь</span>
+          </div>
+        </div>
+
+        <div class="pickup-hint hidden" id="pickup-hint">E — забрать пиццу</div>
+      </div>
+
+      <!-- ================= ГЛАВНОЕ МЕНЮ ================= -->
+      <div id="menu" class="screen">
+        <div class="menu-bg"></div>
+        <div class="menu-inner">
+          <div class="logo">
+            <div class="logo-kicker">TEENAGE MUTANT NINJA TURTLES</div>
+            <h1>ТЕНИ<br /><span>НЬЮ-ЙОРКА</span></h1>
+            <div class="logo-sub">3D-экшен · 4 черепашки · один Шреддер</div>
+          </div>
+          <div class="menu-actions">
+            <button class="btn primary" id="btn-continue">ПРОДОЛЖИТЬ</button>
+            <button class="btn" id="btn-new">НОВАЯ ИГРА</button>
+            <button class="btn ghost" id="btn-levels">ГЛАВЫ</button>
+            <button class="btn ghost" id="btn-help">УПРАВЛЕНИЕ</button>
+          </div>
+          <div class="menu-foot">
+            <span id="menu-progress">Прогресс: 0%</span>
+            <span class="dot">·</span>
+            <span id="menu-best">Рекорд: 0</span>
+            <span class="dot">·</span>
+            <button class="link" id="btn-sound">Звук: вкл</button>
+          </div>
+        </div>
+        <div class="menu-aside">
+          <div class="cast" id="menu-cast"></div>
+          <div class="tip">Совет: комбо растёт, пока ты не прерываешь серию. Смена черепашки сбрасывает комбо — бей до конца!</div>
+        </div>
+      </div>
+
+      <!-- ================= ВЫБОР ГЛАВЫ ================= -->
+      <div id="levels" class="screen hidden">
+        <div class="panel wide">
+          <h2>ГЛАВЫ</h2>
+          <div class="level-grid" id="level-grid"></div>
+          <button class="btn ghost back" data-back>НАЗАД</button>
+        </div>
+      </div>
+
+      <!-- ================= УПРАВЛЕНИЕ ================= -->
+      <div id="help" class="screen hidden">
+        <div class="panel wide">
+          <h2>УПРАВЛЕНИЕ</h2>
+          <div class="help-grid">
+            <div class="help-col">
+              <h3>Бой</h3>
+              <div class="krow"><kbd>J</kbd><kbd>ЛКМ</kbd><span>Серия ударов (комбо из 3)</span></div>
+              <div class="krow"><kbd>K</kbd><span>Тяжёлый удар — пробивает блок</span></div>
+              <div class="krow"><kbd>L</kbd><span>Спецприём черепашки (энергия)</span></div>
+              <div class="krow"><kbd>Shift</kbd><span>Рывок — неуязвимость на миг</span></div>
+              <div class="krow"><kbd>E</kbd><span>Подобрать пиццу / предмет</span></div>
+            </div>
+            <div class="help-col">
+              <h3>Движение</h3>
+              <div class="krow"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Бег по улице</span></div>
+              <div class="krow"><kbd>Пробел</kbd><span>Прыжок</span></div>
+              <div class="krow"><kbd>←</kbd><kbd>→</kbd><span>Поворот камеры</span></div>
+              <div class="krow"><kbd>ПКМ</kbd><span>Вращение камеры мышью</span></div>
+              <div class="krow"><kbd>Q</kbd><kbd>1-4</kbd><span>Сменить черепашку</span></div>
+            </div>
+            <div class="help-col">
+              <h3>Черепашки</h3>
+              <div class="krow"><kbd>1</kbd><span>Леонардо — вихрь катаны</span></div>
+              <div class="krow"><kbd>2</kbd><span>Рафаэль — ярость кулака</span></div>
+              <div class="krow"><kbd>3</kbd><span>Донателло — удар посохом</span></div>
+              <div class="krow"><kbd>4</kbd><span>Микеланджело — нуна-смерч</span></div>
+              <div class="krow"><kbd>Esc</kbd><span>Пауза</span></div>
+            </div>
+          </div>
+          <button class="btn ghost back" data-back>НАЗАД</button>
+        </div>
+      </div>
+
+      <!-- ================= ПАУЗА ================= -->
+      <div id="pause" class="screen hidden">
+        <div class="panel">
+          <h2>ПАУЗА</h2>
+          <div class="pause-stats" id="pause-stats"></div>
+          <div class="pause-actions">
+            <button class="btn primary" id="btn-resume">ПРОДОЛЖИТЬ</button>
+            <button class="btn ghost" id="btn-restart">ЗАНОВО</button>
+            <button class="btn ghost" id="btn-quit">В МЕНЮ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ИТОГИ ГЛАВЫ ================= -->
+      <div id="clear" class="screen hidden">
+        <div class="panel">
+          <div class="rank" id="clear-rank">A</div>
+          <h2 id="clear-title">ГЛАВА ПРОЙДЕНА</h2>
+          <div class="stats" id="clear-stats"></div>
+          <div class="unlock hidden" id="clear-unlock"></div>
+          <div class="pause-actions">
+            <button class="btn primary" id="btn-next">ДАЛЬШЕ</button>
+            <button class="btn ghost" id="btn-clear-menu">В МЕНЮ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= КОНЕЦ ИГРЫ ================= -->
+      <div id="over" class="screen hidden">
+        <div class="panel">
+          <h2>ВСЕ ЧЕТВЕРО ПОВЕРЖЕНЫ</h2>
+          <p class="muted">Нью-Йорку нужен ещё один шанс.</p>
+          <div class="pause-actions">
+            <button class="btn primary" id="btn-retry">ПОПРОБОВАТЬ СНОВА</button>
+            <button class="btn ghost" id="btn-over-menu">В МЕНЮ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ЗАГРУЗКА ================= -->
+      <div id="loading" class="screen">
+        <div class="loader">
+          <div class="loader-logo">TMNT</div>
+          <div class="loader-bar"><div id="loader-fill"></div></div>
+          <div class="loader-text" id="loader-text">Собираем крыши Нью-Йорка…</div>
+        </div>
+      </div>
+
+      <div id="level-intro" class="hidden">
+        <div class="li-kicker" id="li-kicker">ГЛАВА 1</div>
+        <div class="li-title" id="li-title">Переулок Клинка</div>
+        <div class="li-desc" id="li-desc"></div>
+      </div>
+
+      <div id="toast" class="hidden"></div>
+      <div id="touch-ui" class="hidden">
+        <div id="stick"><div id="stick-knob"></div></div>
+        <div class="touch-btns">
+          <button class="tbtn atk" data-act="light">УДАР</button>
+          <button class="tbtn heavy" data-act="heavy">ТЯЖ</button>
+          <button class="tbtn spec" data-act="special">СПЕЦ</button>
+          <button class="tbtn jump" data-act="jump">↑</button>
+          <button class="tbtn swap" data-act="swap">Q</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
