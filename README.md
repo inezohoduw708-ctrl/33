@@ -13,9 +13,10 @@
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173 — разработка
-npm run build      # сборка в dist/ (относительные пути, можно открыть с диска/хостинга)
-npm run preview    # локальный предпросмотр собранной версии
+npm run dev        # http://localhost:5173 — разработка (HMR)
+npm run build      # сборка в dist/ (относительные пути)
+npm run serve      # http://localhost:8080 — готовый статичный сервер: / = запуск игры, /play = сразу игра
+npm run preview    # альтернативный предпросмотр средствами vite
 ```
 
 **Один файл без сервера:** `npm run single` собирает `game.html` — самодостаточный HTML
